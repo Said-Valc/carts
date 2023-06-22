@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper{
+            border: 1px solid grey;
+            margin: auto;
+            width: 400px;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: cornsilk;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            display: none;
+        }
+        .cart{
+            width: 90px;
+            height: 110px;
+            border: 1px solid orange;
+            background-color: orange;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        #timer{
+            text-align: center;
+            color: orange;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="start()">Начать игру</button>
+    <h2 id="timer">
+        
+    </h2>
+    <div class="wrapper">
+        
+    </div>
+    <p>1</p>1
+    <p>2</p>
+    <p>3</p>
+    <p>4</p>
+    <script>
+        let check = 4;
+        let game = document.querySelector('.wrapper');
+        function start(){
+            game.style.display = 'flex';
+            addCarts(4, 4);
+            let time = 3;
+            let id = setInterval(() =>{
+                if(time == 0){
+                    clearInterval(id)
+                    timer.innerHTML = 'start'
+                    funcTimer(20);
+                    randAddPoint(4);
+                }
+                timer.innerHTML = time;
+                time--;
+            }, 800)
+        }
+
+        function funcTimer(time){
+            let id = setInterval(() =>{
+                if(time == 0) {
+                    clearInterval(id);
+                    gameOver();
+                }
+                timer.innerHTML = time;
+                time--;
+            }, 1000)
+        }
+
+        function gameOver(){
+            document.body.addEventListener('click', function(event){
+                event.stopPropagation();
+                alert('Игра закончена');
+            }, true)
+        }
+
+        function addCarts(...arg){
+            [cols, rows] = [...arg];
+            let data_num = 1;
+            for(let i = 0; i < rows; i++){
+                for(let i = 0; i < cols; i++){
+                    game.innerHTML += `
+                    <div class="cart" data-num="${data_num}"></div>
+                    `
+                    data_num++;
+                }
+            }
+        }
+
+        function randAddPoint(num){
+            num = num * num;
+            let carts = game.children;
+            let iter = carts[Symbol.iterator]();
+            let rand = 0;
+            
+            let pointers = randS(num)
+            localStorage.setItem('pointers', JSON.stringify(pointers));
+            for(let val of iter){
+                if(pointers.indexOf(+val.dataset.num) != -1){
+                    val.style.background = 'green'
+                }
+            }
+            hidePointers(1000);
+        }
+
+        function hidePointers(time){
+            let carts = game.children;
+            setTimeout(() =>{
+                for(let val of carts){
+                    val.style.background = 'orange'
+                    val.addEventListener('click', clickPointer)
+                }
+            }, time)
+        }
+
+        function clickPointer(event){
+            let pointers = JSON.parse(localStorage.getItem('pointers'))
+            if(pointers.indexOf(+event.target.dataset.num) != -1){
+                event.target.style.background = 'green'
+                check--;
+            }else{
+                event.target.style.background = 'white'
+            }
+            if(check == 0) gameOver();
+        }
+
+        
+
+        function randS(num){
+            let iter = Math.sqrt(num);
+            let pointers = [];
+            let rand = 0;
+            for(let i = 0; i < iter; i++){
+                rand = Math.ceil(Math.random() * num);
+                if(pointers.indexOf(rand) == -1)
+                {
+                    pointers.push(rand);
+                }else{
+                    i--
+                }
+                
+            }
+            console.log(pointers)
+            return pointers;
+        }
+    </script>
+</body>
+</html>
